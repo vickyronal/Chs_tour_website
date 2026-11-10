@@ -1,24 +1,35 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import Scene from './Scene.astro';
-import { formatPrice } from '../lib/enquiry';
+import { formatAmount } from '../lib/enquiry';
 
 interface Props {
   tour: CollectionEntry<'tours'>;
   size?: 'tall' | 'mid' | 'short';
+  /** Stretch to fill its grid tile (bento layout); the photo takes the spare height. */
+  fill?: boolean;
 }
-const { tour, size = 'mid' } = Astro.props;
+const { tour, size = 'mid', fill = false } = Astro.props;
 const t = tour.data;
 const ratio = { tall: '4 / 5', mid: '4 / 4.2', short: '4 / 3.4' }[size];
+const amount = formatAmount(t.fromPrice);
 ---
-<a class="ui-card" href={`/tours/${tour.id}`} style={`--card-ratio: ${ratio}`}>
+<a class:list={['ui-card', { 'ui-card--fill': fill }]} href={`/tours/${tour.id}`} style={fill ? undefined : `--card-ratio: ${ratio}`}>
   <span class="ui-card__media">
-    <Scene name={t.scene} sizes="(max-width: 760px) 70vw, 340px" />
+    <Scene name={t.scene} sizes={fill ? '(max-width: 640px) 92vw, (max-width: 1023px) 46vw, 60vw' : '(max-width: 760px) 70vw, 340px'} />
     {!t.verified && <span class="ui-card__badge">Sample</span>}
   </span>
   <span class="ui-card__body">
     <span class="ui-card__title">{t.title}</span>
     <span class="ui-card__meta">{t.days} days, {t.nights} nights</span>
-    <span class="ui-card__price">{formatPrice(t.fromPrice)}</span>
+    {amount ? (
+      <span class="ui-card__price">
+        <span class="ui-card__price-from">From</span>{' '}
+        <strong class="ui-card__price-amount">{amount}</strong>{' '}
+        <span class="ui-card__price-unit">per person</span>
+      </span>
+    ) : (
+      <span class="ui-card__price"><span class="ui-card__price-unit">Price on request</span></span>
+    )}
   </span>
 </a>

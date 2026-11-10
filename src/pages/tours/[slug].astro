@@ -8,7 +8,7 @@ import Scene from '../../components/Scene.astro';
 import TourCard from '../../components/TourCard.astro';
 import { faqs } from '../../data/content';
 import { destinations } from '../../data/destinations';
-import { formatPrice, whatsappLink } from '../../lib/enquiry';
+import { formatAmount, whatsappLink } from '../../lib/enquiry';
 import Page from '../../layouts/Page.astro';
 
 export async function getStaticPaths() {
@@ -29,7 +29,9 @@ const related = tours.filter((o) => o.id !== tour.id).slice(0, 3);
     <div class="top__text">
       <p class="chips">
         <span class="chip">{t.days} days, {t.nights} nights</span>
-        <span class="chip">{formatPrice(t.fromPrice)}</span>
+        {formatAmount(t.fromPrice)
+          ? <span class="chip chip--price">From <strong>{formatAmount(t.fromPrice)}</strong> per person</span>
+          : <span class="chip">Price on request</span>}
       </p>
       <h1>{t.title}</h1>
       <p class="top__summary">{t.summary}</p>
@@ -152,6 +154,8 @@ const related = tours.filter((o) => o.id !== tour.id).slice(0, 3);
     line-height: 0.98;
     letter-spacing: -0.04em;
   }
+  .chip--price { padding: 6px 16px; font-size: 1rem; }
+  .chip--price strong { font-size: 1.25rem; font-weight: 700; font-stretch: 85%; letter-spacing: -0.02em; }
   .top__summary { max-width: 34rem; font-size: 1.125rem; }
 
   .hl { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-top: 20px; }

@@ -7,36 +7,26 @@ import FinalCta from '../components/FinalCta.astro';
 import HeroExpand from '../components/HeroExpand.astro';
 import Planner from '../components/Planner.astro';
 import TravellerStories from '../components/TravellerStories.astro';
+import { BentoGrid } from '@/components/ui/bento-grid';
 import TourCard from '../components/TourCard.astro';
 import { faqs, tripTypes } from '../data/content';
 import Page from '../layouts/Page.astro';
 
 const featured = (await getCollection('tours')).filter((t) => t.data.featured);
 const reviews = await getCollection('reviews');
-const sizes = ['tall', 'short', 'mid', 'tall', 'short', 'mid'] as const;
+// Bento layout on large screens: one tall tile, two standard, one wide
+const bentoSpans = ['min-w-0 lg:row-span-2', 'min-w-0', 'min-w-0', 'min-w-0 lg:col-span-2'];
 ---
 <Page
   title="CHS Tours | Philippines, Bali, Maldives and Sri Lanka holidays"
   description="Holidays to the Philippines, Bali, the Maldives and Sri Lanka, with flights and visa handled, planned with a real person at CHS Tours in Chennai. Tell us where you'd like to go on WhatsApp or by phone."
 >
   <HeroExpand />
-  <Destinations />
-
-  <section class="packages" aria-labelledby="packages-title">
-    <div class="packages__head">
-      <h2 class="section-title" id="packages-title">Trips to <span class="accent">start from.</span></h2>
-      <a class="btn btn--ghost" href="/tours">See all tours</a>
-    </div>
-    <ul class="packages__row">
-      {featured.map((tour, i) => <li><TourCard tour={tour} size={sizes[i % sizes.length]} /></li>)}
-    </ul>
-  </section>
-
   <section class="section section--tight" aria-labelledby="types-title">
     <h2 class="section-title" id="types-title">Who's <span class="accent">travelling?</span></h2>
-    <ul class="types">
-      {tripTypes.map((t) => (
-        <li>
+    <ul class="types" data-reveal-group>
+      {tripTypes.map((t, i) => (
+        <li style={`--i: ${i}`}>
           <a class="type" href={`/trips/${t.slug}`}>
             <img class="scene" src={t.photo} alt="" width="640" height="800" loading="lazy" decoding="async" style={`object-position: ${t.focus}`} />
             <span class="type__text">
@@ -50,8 +40,25 @@ const sizes = ['tall', 'short', 'mid', 'tall', 'short', 'mid'] as const;
     </ul>
   </section>
 
-  <Planner />
+  <Destinations />
 
+  <section class="packages" aria-labelledby="packages-title">
+    <div class="packages__head">
+      <h2 class="section-title" id="packages-title">Trips to <span class="accent">start from.</span></h2>
+      <a class="btn btn--ghost" href="/tours">See all tours</a>
+    </div>
+    <div class="packages__grid">
+      <BentoGrid className="grid-cols-1 gap-4 auto-rows-[22rem] sm:grid-cols-2 lg:grid-cols-3 lg:auto-rows-[21rem]">
+        {featured.map((tour, i) => (
+          <div class={bentoSpans[i % bentoSpans.length]}>
+            <TourCard tour={tour} fill />
+          </div>
+        ))}
+      </BentoGrid>
+    </div>
+  </section>
+
+  <Planner />
 
   {reviews.length > 0 && <TravellerStories reviews={reviews} />}
 
@@ -66,6 +73,22 @@ const sizes = ['tall', 'short', 'mid', 'tall', 'short', 'mid'] as const;
   <FinalCta />
 </Page>
 
+<script>
+  // "Who's travelling?": cards rise in one after another when the section scrolls into view
+  const group = document.querySelector<HTMLElement>('[data-reveal-group]');
+  if (group && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    group.classList.add('is-waiting');
+    const io = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) {
+        group.classList.remove('is-waiting');
+        group.classList.add('is-in');
+        io.disconnect();
+      }
+    }, { threshold: 0.25 });
+    io.observe(group);
+  }
+</script>
+
 <style>
   .packages { padding-block: 32px clamp(40px, 6vw, 72px); }
   .packages__head {
@@ -77,17 +100,7 @@ const sizes = ['tall', 'short', 'mid', 'tall', 'short', 'mid'] as const;
     padding-inline: var(--gutter);
     margin-bottom: 28px;
   }
-  .packages__row {
-    display: flex;
-    align-items: flex-start;
-    gap: clamp(12px, 1.6vw, 20px);
-    padding-inline: var(--gutter);
-    overflow-x: auto;
-    scroll-snap-type: x proximity;
-    scroll-padding-inline: var(--gutter);
-    scrollbar-width: none;
-  }
-  .packages__row li { flex: 0 0 clamp(240px, 24vw, 340px); scroll-snap-align: start; padding-top: 6px; }
+  .packages__grid { padding-inline: var(--gutter); }
 
   .types { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 28px; }
   .type {
@@ -123,11 +136,40 @@ const sizes = ['tall', 'short', 'mid', 'tall', 'short', 'mid'] as const;
   }
   .type__arrow :global(svg) { width: 18px; height: 18px; }
 
+  /* Motion: cards rise in, one after another */
+  .types > li { transition: opacity 0.8s var(--ease), transform 0.9s var(--ease); transition-delay: calc(var(--i) * 120ms); }
+  .types.is-waiting > li { opacity: 0; transform: translateY(40px); }
+  /* each arrow nudges as its card lands */
+  .types.is-in .type__arrow :global(svg) { animation: arrow-nudge 0.9s var(--ease) both; animation-delay: calc(0.6s + var(--i) * 120ms); }
+  @keyframes arrow-nudge {
+    0%, 100% { transform: translateX(0); }
+    30% { transform: translateX(5px); }
+    55% { transform: translateX(-2px); }
+    75% { transform: translateX(3px); }
+  }
+  /* Hover: photo eases in, arrow slides out and back in from the left */
+  .type > :global(img) { transition: transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1); }
+  .type__arrow { overflow: hidden; transition: transform 0.35s var(--ease); }
+  @media (hover: hover) and (pointer: fine) {
+    .type:hover > :global(img) { transform: scale(1.06); }
+    .type:hover .type__arrow { transform: scale(1.08); }
+    .type:hover .type__arrow :global(svg) { animation: arrow-through 0.6s var(--ease) both; }
+  }
+  .type:focus-visible .type__arrow :global(svg) { animation: arrow-through 0.6s var(--ease) both; }
+  @keyframes arrow-through {
+    0% { transform: translateX(0); opacity: 1; }
+    45% { transform: translateX(150%); opacity: 0; }
+    46% { transform: translateX(-150%); opacity: 0; }
+    100% { transform: translateX(0); opacity: 1; }
+  }
+  /* Touch: a light press */
+  .type { transition: transform 0.25s ease; }
+  .type:active { transform: scale(0.98); }
+
   .faq-preview { display: grid; grid-template-columns: 1fr 1.6fr; gap: 32px; }
   .faq-preview .btn { margin-top: 20px; }
 
   @media (max-width: 760px) {
-    .packages__row li { flex-basis: 70vw; }
     .types, .faq-preview { grid-template-columns: 1fr; }
     .type { aspect-ratio: 4 / 3.4; }
   }

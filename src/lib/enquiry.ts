@@ -10,6 +10,11 @@ export function telLink(): string {
   return `tel:${company.phone.replace(/\s/g, '')}`;
 }
 
+/** Just the amount, e.g. "₹75,000", or null when the price is on request. */
+export function formatAmount(price: number | null): string | null {
+  return price ? `₹${price.toLocaleString('en-IN')}` : null;
+}
+
 export function formatPrice(price: number | null): string {
   return price ? `From ₹${price.toLocaleString('en-IN')} per person` : 'Price on request';
 }
