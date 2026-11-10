@@ -1,0 +1,29 @@
+---
+import { getCollection } from 'astro:content';
+import FinalCta from '../../components/FinalCta.astro';
+import Notice from '../../components/Notice.astro';
+import PageHero from '../../components/PageHero.astro';
+import TourCard from '../../components/TourCard.astro';
+import { destinations, type Destination } from '../../data/destinations';
+import Page from '../../layouts/Page.astro';
+
+export function getStaticPaths() {
+  return destinations.map((d) => ({ params: { slug: d.slug }, props: { d } }));
+}
+const { d } = Astro.props as { d: Destination };
+const tours = (await getCollection('tours')).filter((t) => t.data.destination === d.slug);
+const message = `Hi CHS Tours, I'd like help planning a trip to ${d.name}.`;
+---
+<Page title={`${d.name} holidays from Chennai | CHS Tours`} description={d.intro} whatsappMessage={message}>
+  <PageHero title={d.name} intro={d.intro} scene={d.scene} />
+  <section class="section section--tight">
+    {!d.verified && <Notice>this is a sample destination, for CHS to confirm or replace.</Notice>}
+    <h2 class="section-title">Trips in <span class="accent">{d.name}</span></h2>
+    <ul class="grid">{tours.map((t) => <li><TourCard tour={t} /></li>)}</ul>
+  </section>
+  <FinalCta message={message} />
+</Page>
+
+<style>
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 340px)); gap: 18px; margin-top: 24px; }
+</style>

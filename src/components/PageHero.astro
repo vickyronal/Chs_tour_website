@@ -1,0 +1,57 @@
+---
+import Scene from './Scene.astro';
+import type { SceneName } from '../lib/scene';
+
+interface Props {
+  title: string;
+  accent?: string;
+  intro?: string;
+  scene?: SceneName;
+}
+const { title, accent, intro, scene } = Astro.props;
+---
+<section class="ph">
+  <div class="ph__text">
+    <h1>{title}{accent && <span class="accent"> {accent}</span>}</h1>
+    {intro && <p>{intro}</p>}
+    <slot />
+  </div>
+  {scene && <div class="ph__arch"><Scene name={scene} sizes="320px" eager /></div>}
+</section>
+
+<style>
+  .ph {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 32px;
+    min-height: clamp(340px, 52svh, 520px);
+    margin: var(--frame-gap);
+    padding: 120px clamp(20px, 3.4vw, 48px) 0;
+    overflow: hidden;
+    border-radius: var(--radius-frame);
+    background: var(--dusk);
+    color: var(--text-on-dark);
+  }
+  .ph__text { padding-bottom: clamp(28px, 4vw, 48px); max-width: 46rem; }
+  h1 {
+    font-size: clamp(2.75rem, 7vw, 6rem);
+    font-stretch: 80%;
+    font-weight: 600;
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+  }
+  h1 .accent { display: block; font-size: 0.86em; letter-spacing: -0.01em; }
+  p { margin-top: 16px; max-width: 34rem; font-size: 1.125rem; }
+  .ph__arch {
+    flex: 0 0 clamp(200px, 24vw, 320px);
+    aspect-ratio: 3 / 3.4;
+    overflow: hidden;
+    border-radius: 999px 999px 0 0;
+  }
+
+  @media (max-width: 760px) {
+    .ph { padding-top: 96px; }
+    .ph__arch { display: none; }
+  }
+</style>

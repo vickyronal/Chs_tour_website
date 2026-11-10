@@ -1,0 +1,105 @@
+---
+import Scene from './Scene.astro';
+import { telLink, whatsappLink } from '../lib/enquiry';
+
+const items = [
+  { label: 'Home', href: '/' },
+  { label: 'Tours', href: '/tours' },
+  { label: 'Destinations', href: '/destinations' },
+  { label: 'About', href: '/about' },
+  { label: 'Contact', href: '/contact' },
+  { label: 'WhatsApp', href: whatsappLink() },
+  { label: 'Call us', href: telLink() },
+];
+---
+<dialog class="menu" data-menu aria-label="Menu">
+  <button class="round menu__close" type="button" data-menu-close aria-label="Close menu">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M2 2l12 12M14 2L2 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+    </svg>
+  </button>
+  <div class="menu__side menu__side--left" aria-hidden="true">
+    <div class="menu__arch"><Scene name="maldives" sizes="200px" /></div>
+    <div class="menu__arch"><Scene name="sri-lanka" sizes="200px" /></div>
+  </div>
+  <nav aria-label="Menu links">
+    <ul class="menu__list">
+      {items.map((item) => <li><a href={item.href} data-menu-link>{item.label}</a></li>)}
+    </ul>
+  </nav>
+  <div class="menu__side menu__side--right" aria-hidden="true">
+    <div class="menu__arch"><Scene name="philippines" sizes="200px" /></div>
+    <div class="menu__arch"><Scene name="bali" sizes="200px" /></div>
+  </div>
+</dialog>
+
+<script>
+  const menu = document.querySelector<HTMLDialogElement>('[data-menu]');
+  document.querySelectorAll('[data-menu-open]').forEach((button) => {
+    button.addEventListener('click', () => menu?.showModal());
+  });
+  document.querySelector('[data-menu-close]')?.addEventListener('click', () => menu?.close());
+  document.querySelectorAll('[data-menu-link]').forEach((link) => {
+    link.addEventListener('click', () => menu?.close());
+  });
+</script>
+
+<style>
+  .menu {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: var(--ink);
+    color: var(--paper);
+    overflow: auto;
+  }
+  .menu[open] {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: clamp(16px, 4vw, 64px);
+    animation: menu-in 0.45s var(--ease);
+  }
+  .menu::backdrop { background: var(--ink); }
+  @keyframes menu-in {
+    from { opacity: 0; transform: translateY(12px); }
+  }
+  .menu__close { position: absolute; top: 20px; right: 20px; z-index: 1; }
+  .menu__list { text-align: center; }
+  .menu__list a {
+    display: inline-block;
+    padding: 0.02em 0.4em 0.1em;
+    border-radius: 22px;
+    font-size: clamp(2.25rem, min(7.5vw, 10.5svh), 5.25rem);
+    font-stretch: 85%;
+    font-weight: 600;
+    line-height: 1.12;
+    letter-spacing: -0.03em;
+    text-decoration: none;
+    transition: background-color 0.2s, color 0.2s;
+  }
+  .menu__list a:hover, .menu__list a:focus-visible {
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .menu__side { display: flex; align-items: center; gap: 16px; }
+  .menu__side--left { justify-content: flex-start; transform: translateX(-12%); }
+  .menu__side--right { justify-content: flex-end; transform: translateX(12%); }
+  .menu__arch {
+    flex: 0 1 200px;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    border-radius: 999px 999px 24px 24px;
+  }
+
+  @media (max-width: 900px) {
+    .menu[open] { grid-template-columns: 1fr; }
+    .menu__side { display: none; }
+  }
+</style>

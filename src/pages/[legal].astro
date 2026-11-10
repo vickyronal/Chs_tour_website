@@ -1,0 +1,18 @@
+---
+import Notice from '../components/Notice.astro';
+import PageHero from '../components/PageHero.astro';
+import { legal } from '../data/content';
+import Page from '../layouts/Page.astro';
+
+export function getStaticPaths() {
+  return Object.entries(legal).map(([slug, page]) => ({ params: { legal: slug }, props: { page } }));
+}
+const { page } = Astro.props as { page: { title: string; body: string[] } };
+---
+<Page title={`${page.title} | CHS Tours`} description={`${page.title} information for CHS Tours.`} noindex>
+  <PageHero title={page.title} />
+  <section class="section section--tight prose">
+    <Notice>this wording needs CHS's real terms and an advisor's review before launch.</Notice>
+    {page.body.map((p) => <p>{p}</p>)}
+  </section>
+</Page>

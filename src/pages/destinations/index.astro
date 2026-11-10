@@ -1,0 +1,31 @@
+---
+import PageHero from '../../components/PageHero.astro';
+import Scene from '../../components/Scene.astro';
+import { destinations } from '../../data/destinations';
+import Page from '../../layouts/Page.astro';
+---
+<Page title="Destinations | CHS Tours" description="Countries we plan holidays to, from Chennai.">
+  <PageHero title="Destinations" accent="around the world." intro="Don't see yours? Ask us anyway." scene="bali" />
+  <section class="section section--tight">
+    <ul class="grid">
+      {destinations.map((d) => (
+        <li>
+          <a class="ui-card" href={`/destinations/${d.slug}`} style="--card-ratio: 3 / 4">
+            <span class="ui-card__media">
+              <Scene name={d.scene} described sizes="(max-width: 760px) 90vw, 320px" />
+              {!d.verified && <span class="ui-card__badge">Sample</span>}
+            </span>
+            <span class="ui-card__body">
+              <span class="ui-card__title">{d.name}</span>
+              <span class="ui-card__meta">{d.intro}</span>
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+</Page>
+
+<style>
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+</style>

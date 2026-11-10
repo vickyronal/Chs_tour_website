@@ -1,0 +1,30 @@
+---
+import FinalCta from '../components/FinalCta.astro';
+import Notice from '../components/Notice.astro';
+import PageHero from '../components/PageHero.astro';
+import Page from '../layouts/Page.astro';
+
+const message = "Hi CHS Tours, I'm planning a trip abroad and have a few questions.";
+const topics = [
+  { title: 'Passport', text: "Check the expiry date first. Many countries want your passport valid for several months after you travel, so renew early if it's close." },
+  { title: 'Visa', text: 'We handle the visa process for your trip and tell you what we need from you. Decisions are always made by the authorities concerned, so no travel company can promise an approval.' },
+  { title: 'Money', text: 'Plan how you will pay while away: some local cash, plus a card that works abroad. Ask us how the trip itself is paid for.' },
+  { title: 'Insurance', text: 'Travel insurance helps with medical costs and trip problems. Some countries ask for it, so check before you go.' },
+];
+---
+<Page title="Going abroad | CHS Tours" description="What to sort out before your first trip abroad: passport, visa, money and insurance." whatsappMessage={message}>
+  <PageHero title="Going abroad" accent="what to sort out first." intro="First trip overseas? Start here, then ask us anything." scene="maldives" />
+  <section class="section section--tight">
+    <Notice>this is general guidance for CHS to check before launch.</Notice>
+    <ul class="topics">
+      {topics.map((t) => <li><h2>{t.title}</h2><p>{t.text}</p></li>)}
+    </ul>
+  </section>
+  <FinalCta message={message} />
+</Page>
+
+<style>
+  .topics { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+  li { padding: 24px; border-radius: var(--radius-card); background: var(--card-bg); }
+  h2 { font-family: var(--font-accent); font-style: italic; font-size: 2rem; font-weight: 400; line-height: 1.1; margin-bottom: 8px; }
+</style>

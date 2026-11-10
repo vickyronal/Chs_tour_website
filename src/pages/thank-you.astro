@@ -1,0 +1,13 @@
+---
+import PageHero from '../components/PageHero.astro';
+import { telLink, whatsappLink } from '../lib/enquiry';
+import { company } from '../data/company';
+import Page from '../layouts/Page.astro';
+---
+<Page title="Thank you | CHS Tours" description="We've received your enquiry." noindex>
+  <PageHero title="We've got it." accent="Thank you." intro="Your enquiry reached us, and someone from CHS Tours will contact you on the number you gave." />
+  <section class="section section--tight prose">
+    <p>Need us sooner? <a href={whatsappLink()}>Message us on WhatsApp</a> or call <a href={telLink()}>{company.phone}</a>.</p>
+    <p><a href="/tours">Keep looking at tours</a></p>
+  </section>
+</Page>

@@ -1,0 +1,20 @@
+---
+import { getCollection } from 'astro:content';
+import FinalCta from '../components/FinalCta.astro';
+import Notice from '../components/Notice.astro';
+import PageHero from '../components/PageHero.astro';
+import ReviewGrid from '../components/ReviewGrid.astro';
+import Page from '../layouts/Page.astro';
+
+const reviews = await getCollection('reviews');
+if (reviews.length === 0) return Astro.redirect('/');
+const hasSamples = reviews.some((r) => !r.data.verified);
+---
+<Page title="Reviews | CHS Tours" description="Photos and videos from CHS Tours travellers." noindex={hasSamples}>
+  <PageHero title="Reviews" accent="in their own words." intro="Photos and videos from our travellers. Tap any of them to open." />
+  <section class="section section--tight">
+    {hasSamples && <Notice>these tiles show the layout only. Replace them with real reviews, with each traveller's permission.</Notice>}
+    <ReviewGrid reviews={reviews} filters />
+  </section>
+  <FinalCta />
+</Page>

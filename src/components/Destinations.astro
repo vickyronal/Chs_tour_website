@@ -1,0 +1,135 @@
+---
+// "Where would you like to wake up?": the section pins while you scroll. All four
+// destination prints hang on a swaying string and slide from right to left one
+// after another as you scroll; then the page moves on. Each print is a link to
+// its destination page, and its photo zooms in on hover.
+import PolaroidLineCarousel from '@/components/ui/polaroid-line-carousel';
+import { destinations } from '../data/destinations';
+import { photos } from '../lib/scene';
+
+const slides = destinations.map((d) => ({
+  image: `/destinations/${d.scene}-1024.webp`,
+  title: d.name,
+  linkLabel: `${d.name}: see trips`,
+  alt: photos[d.scene].alt,
+  focus: photos[d.scene].focus,
+  href: `/destinations/${d.slug}`,
+}));
+---
+<section class="dest" id="destinations" aria-labelledby="dest-title" data-pl-track>
+  <div class="dest__pin">
+    <h2 class="dest__title" id="dest-title" data-rise>
+      <span class="dest__line">Where would you like</span>
+      <span class="dest__line accent">to wake up?</span>
+    </h2>
+
+    <div class="dest__stage">
+      <PolaroidLineCarousel
+        client:visible={{ rootMargin: '400px' }}
+        slides={slides}
+        scrollDriven
+        controls={false}
+        height="100%"
+        cardWidth={380}
+        sag={46}
+        autoplay={0}
+        string="#9b8f80"
+        background="var(--stone)"
+        ink="var(--ink)"
+        muted="var(--text-muted)"
+        ariaLabel="Destinations"
+      />
+      <noscript>
+        <ul class="dest__fallback">
+          {destinations.map((d) => (
+            <li><a href={`/destinations/${d.slug}`}>{d.name}</a></li>
+          ))}
+        </ul>
+      </noscript>
+    </div>
+
+    <a class="btn btn--ghost dest__other" href="/contact?where=Somewhere%20else#plan">
+      Somewhere else in mind?
+    </a>
+  </div>
+</section>
+
+<script>
+  // Heading lines rise in once the section scrolls into view
+  const title = document.querySelector<HTMLElement>('[data-rise]');
+  if (title && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    title.classList.add('is-waiting');
+    const io = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) {
+        title.classList.remove('is-waiting');
+        io.disconnect();
+      }
+    }, { threshold: 0.4 });
+    io.observe(title);
+  }
+</script>
+
+<style>
+  /* The tall track gives the scroll distance; the pin stays on screen meanwhile */
+  .dest {
+    position: relative;
+    scroll-margin-top: 0;
+  }
+  :global(.js) .dest { height: calc(100svh + 4 * 60svh); }
+  .dest__pin {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    justify-items: center;
+    gap: clamp(8px, 1.5vh, 16px);
+    padding-block: clamp(48px, 9vh, 96px) clamp(24px, 4vh, 48px);
+  }
+  :global(.js) .dest__pin {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+  }
+  .dest__title {
+    max-width: 14em;
+    padding-inline: var(--gutter);
+    text-align: center;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-stretch: 85%;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.035em;
+  }
+  .dest__line {
+    display: block;
+    transition: transform 0.9s var(--ease), opacity 0.9s var(--ease);
+  }
+  .dest__line.accent {
+    font-size: 1.1em;
+    color: var(--dusk);
+    transition-delay: 0.12s;
+  }
+  .dest__title.is-waiting .dest__line {
+    opacity: 0;
+    transform: translateY(40%);
+  }
+  .dest__stage { width: 100%; min-height: 0; }
+  .dest__fallback {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    padding: 24px var(--gutter);
+  }
+  .dest__fallback a {
+    display: block;
+    padding: 10px 20px;
+    border-radius: var(--radius-pill);
+    background: var(--paper);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  /* Phones: keep the button clear of the WhatsApp bar */
+  @media (max-width: 760px) {
+    .dest__pin { padding-bottom: 96px; }
+  }
+</style>

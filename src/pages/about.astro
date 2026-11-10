@@ -1,0 +1,21 @@
+---
+import FinalCta from '../components/FinalCta.astro';
+import Notice from '../components/Notice.astro';
+import PageHero from '../components/PageHero.astro';
+import { company } from '../data/company';
+import Page from '../layouts/Page.astro';
+---
+<Page title="About | CHS Tours" description="CHS Tours plans international holidays from Mount Road, Chennai.">
+  <PageHero title="About us" accent="planning trips abroad." intro="We plan international holidays from our office on Mount Road, Chennai." scene="sri-lanka" />
+  <section class="section section--tight prose">
+    <Notice>add the founder's story, the year CHS started, team names and photos, and real office photos.</Notice>
+    <h2 class="section-title">Come <span class="accent">and meet us.</span></h2>
+    <p class="gap">{company.address.line1}, {company.address.line2}, {company.address.line3}.</p>
+    <p><a href={company.mapsUrl}>Get directions</a></p>
+  </section>
+  <FinalCta />
+</Page>
+
+<style>
+  .gap { margin-top: 16px; }
+</style>

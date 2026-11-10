@@ -1,0 +1,16 @@
+---
+import FaqList from '../components/FaqList.astro';
+import FinalCta from '../components/FinalCta.astro';
+import Notice from '../components/Notice.astro';
+import PageHero from '../components/PageHero.astro';
+import { faqs } from '../data/content';
+import Page from '../layouts/Page.astro';
+---
+<Page title="FAQ | CHS Tours" description="Answers to common questions about planning a trip with CHS Tours.">
+  <PageHero title="Questions" accent="and straight answers." />
+  <section class="section section--tight">
+    <Notice>CHS needs to confirm these answers before launch.</Notice>
+    <FaqList items={faqs} />
+  </section>
+  <FinalCta />
+</Page>

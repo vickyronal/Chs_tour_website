@@ -1,0 +1,77 @@
+{
+  "title": "Palawan Islands and Manila",
+  "summary": "Limestone lagoons, island-hopping boats and a walk through old Manila.",
+  "destination": "philippines",
+  "types": [
+    "honeymoon",
+    "group"
+  ],
+  "scene": "philippines",
+  "days": 6,
+  "nights": 5,
+  "bestTime": "November to May",
+  "stay": "Island and city hotels, confirmed when you book",
+  "transport": "Flights, private transfers and shared island boats",
+  "money": "Local currency is the Philippine peso.",
+  "route": [
+    "Manila",
+    "Puerto Princesa",
+    "El Nido",
+    "Manila"
+  ],
+  "highlights": [
+    "Puerto Princesa Underground River",
+    "Island hopping in El Nido",
+    "Swimming in the Big Lagoon",
+    "Intramuros walk in Manila"
+  ],
+  "itinerary": [
+    {
+      "day": 1,
+      "title": "Arrive in Manila",
+      "description": "Airport transfer to your hotel."
+    },
+    {
+      "day": 2,
+      "title": "Manila and Puerto Princesa",
+      "description": "Morning walk in Intramuros, then fly to Palawan."
+    },
+    {
+      "day": 3,
+      "title": "Underground River",
+      "description": "A day trip to the river, by boat through the cave."
+    },
+    {
+      "day": 4,
+      "title": "Transfer to El Nido",
+      "description": "Drive north and enjoy a free evening."
+    },
+    {
+      "day": 5,
+      "title": "El Nido island hopping",
+      "description": "A full day by boat around the lagoons and beaches."
+    },
+    {
+      "day": 6,
+      "title": "Departure",
+      "description": "Transfer back for your flight home."
+    }
+  ],
+  "included": [
+    "Return flights",
+    "5 nights in hotels",
+    "Daily breakfast",
+    "Transfers and boat trips as listed"
+  ],
+  "excluded": [
+    "Travel insurance",
+    "Meals not listed",
+    "Personal expenses"
+  ],
+  "fromPrice": 95000,
+  "notes": [],
+  "featured": true,
+  "verified": false,
+  "visa": "We handle the visa process and tell you what we need from you. The final decision rests with the authorities.",
+  "flights": "Return flights are included."
+}

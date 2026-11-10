@@ -1,0 +1,87 @@
+---
+import { getCollection } from 'astro:content';
+import PageHero from '../../components/PageHero.astro';
+import TourCard from '../../components/TourCard.astro';
+import { tripTypes } from '../../data/content';
+import Page from '../../layouts/Page.astro';
+
+const tours = await getCollection('tours');
+const lengthOf = (days: number) => (days <= 4 ? 'short' : days <= 5 ? 'mid' : 'long');
+const filters = [
+  { key: 'type', label: 'Trip type', options: [['all', 'All'], ...tripTypes.map((t) => [t.slug, t.label])] },
+  { key: 'length', label: 'Length', options: [['all', 'Any'], ['short', 'Up to 4 days'], ['mid', '5 days'], ['long', '6 days or more']] },
+];
+---
+<Page title="Tours | CHS Tours" description="International holiday packages from Chennai, planned with a real person at CHS Tours in Chennai.">
+  <PageHero title="Tours" accent="to start from." intro="Every trip here can be changed to suit you." scene="philippines" />
+
+  <section class="section section--tight">
+    <div class="filters" data-filters hidden>
+      {filters.map((f) => (
+        <div class="filter" role="group" aria-label={f.label}>
+          {f.options.map(([value, label], i) => (
+            <button type="button" data-key={f.key} data-value={value} aria-pressed={i === 0 ? 'true' : 'false'}>{label}</button>
+          ))}
+        </div>
+      ))}
+    </div>
+    <p class="count" role="status" data-count></p>
+    <ul class="grid">
+      {tours.map((tour) => (
+        <li data-tour data-type={tour.data.types.join(' ')} data-length={lengthOf(tour.data.days)}>
+          <TourCard tour={tour} />
+        </li>
+      ))}
+    </ul>
+    <p class="empty" data-empty hidden>Nothing matches yet. <a href="/contact#plan">Tell us what you're after</a> and we'll plan it with you.</p>
+  </section>
+</Page>
+
+<script>
+  const state: Record<string, string> = { type: 'all', length: 'all' };
+  const items = [...document.querySelectorAll<HTMLElement>('[data-tour]')];
+  const buttons = [...document.querySelectorAll<HTMLButtonElement>('[data-key]')];
+  const count = document.querySelector<HTMLElement>('[data-count]')!;
+  const empty = document.querySelector<HTMLElement>('[data-empty]')!;
+
+  const apply = () => {
+    let shown = 0;
+    items.forEach((item) => {
+      const match =
+        (state.type === 'all' || item.dataset.type!.split(' ').includes(state.type)) &&
+        (state.length === 'all' || item.dataset.length === state.length);
+      item.hidden = !match;
+      if (match) shown++;
+    });
+    empty.hidden = shown > 0;
+    count.textContent = `${shown} ${shown === 1 ? 'tour' : 'tours'}`;
+  };
+
+  buttons.forEach((b) => b.addEventListener('click', () => {
+    state[b.dataset.key!] = b.dataset.value!;
+    buttons.filter((o) => o.dataset.key === b.dataset.key).forEach((o) => o.setAttribute('aria-pressed', String(o === b)));
+    apply();
+  }));
+
+  document.querySelector<HTMLElement>('[data-filters]')!.hidden = false;
+  apply();
+</script>
+
+<style>
+  .filters { display: grid; gap: 8px; }
+  .filters[hidden] { display: none; }
+  .filter { display: flex; flex-wrap: wrap; gap: 6px; }
+  .filter button {
+    min-height: 44px;
+    padding: 0 18px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: var(--paper);
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .filter [aria-pressed='true'] { background: var(--ink); color: var(--paper); }
+  .count { margin: 16px 0 12px; color: var(--text-muted); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 28px 18px; }
+  .grid [hidden] { display: none; }
+</style>

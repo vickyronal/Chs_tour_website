@@ -1,0 +1,130 @@
+---
+// Full-screen viewer for review photos and videos. Opens from any element with
+// [data-open] on the page (data-type, data-src, data-poster, data-quote,
+// data-caption); sample tiles show the photo inside their [data-media].
+import Arrow from './Arrow.astro';
+---
+<dialog class="rv" data-rv aria-label="Review viewer">
+  <button class="round rv__close" type="button" data-rv-close aria-label="Close">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 2l12 12M14 2L2 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+  </button>
+  <button class="round rv__nav rv__nav--prev" type="button" data-rv-step="-1" aria-label="Previous review"><span class="rv__flip"><Arrow /></span></button>
+  <figure class="rv__body">
+    <div class="rv__stage" data-rv-stage></div>
+    <figcaption><span class="accent" data-rv-quote></span> <span data-rv-caption></span></figcaption>
+  </figure>
+  <button class="round rv__nav rv__nav--next" type="button" data-rv-step="1" aria-label="Next review"><Arrow /></button>
+</dialog>
+
+<script>
+  const viewer = document.querySelector<HTMLDialogElement>('[data-rv]');
+  if (viewer) {
+    const stage = viewer.querySelector<HTMLElement>('[data-rv-stage]')!;
+    const quote = viewer.querySelector<HTMLElement>('[data-rv-quote]')!;
+    const caption = viewer.querySelector<HTMLElement>('[data-rv-caption]')!;
+    const tiles = [...document.querySelectorAll<HTMLAnchorElement>('[data-open]')];
+    let current = 0;
+
+    // Previous and next follow what the filter is showing
+    const visible = () => tiles.filter((t) => !t.closest('li')?.hidden);
+
+    const show = (tile: HTMLAnchorElement) => {
+      current = visible().indexOf(tile);
+      const { type, src, poster } = tile.dataset;
+      stage.replaceChildren(); // also stops any video that was playing
+      if (type === 'video' && src) {
+        const video = document.createElement('video');
+        video.src = src;
+        video.controls = true;
+        video.autoplay = true;
+        video.playsInline = true;
+        video.preload = 'auto';
+        if (poster) video.poster = poster;
+        stage.append(video);
+      } else if (src) {
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = tile.dataset.quote ?? '';
+        stage.append(img);
+      } else {
+        const sample = tile.querySelector<HTMLImageElement>('[data-media] img');
+        if (sample) {
+          const img = document.createElement('img');
+          img.src = sample.currentSrc || sample.src;
+          img.alt = '';
+          stage.append(img);
+        }
+      }
+      quote.textContent = tile.dataset.quote ?? '';
+      caption.textContent = tile.dataset.caption ?? '';
+    };
+
+    const step = (by: number) => {
+      const list = visible();
+      show(list[(current + by + list.length) % list.length]);
+    };
+
+    tiles.forEach((tile) => tile.addEventListener('click', (event) => {
+      event.preventDefault();
+      show(tile);
+      viewer.showModal();
+    }));
+    viewer.querySelector('[data-rv-close]')!.addEventListener('click', () => viewer.close());
+    viewer.addEventListener('close', () => stage.replaceChildren());
+    viewer.querySelectorAll<HTMLButtonElement>('[data-rv-step]').forEach((b) => {
+      b.addEventListener('click', () => step(Number(b.dataset.rvStep)));
+    });
+    viewer.addEventListener('keydown', (event) => {
+      if ((event.target as HTMLElement).tagName === 'VIDEO') return; // arrows seek inside the video
+      if (event.key === 'ArrowRight') step(1);
+      if (event.key === 'ArrowLeft') step(-1);
+    });
+
+    let startX = 0;
+    stage.addEventListener('touchstart', (event) => (startX = event.touches[0].clientX), { passive: true });
+    stage.addEventListener('touchend', (event) => {
+      const moved = event.changedTouches[0].clientX - startX;
+      if (Math.abs(moved) > 60) step(moved < 0 ? 1 : -1);
+    });
+  }
+</script>
+
+<style>
+  .rv {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    margin: 0;
+    padding: 16px;
+    border: 0;
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .rv[open] { display: flex; align-items: center; justify-content: center; gap: 16px; }
+  .rv::backdrop { background: var(--ink); }
+  .rv__close { position: absolute; top: 16px; right: 16px; z-index: 2; }
+  .rv__flip { display: block; transform: scaleX(-1); }
+  .rv__nav { flex: none; }
+  .rv__body { display: grid; justify-items: center; gap: 12px; min-width: 0; margin: 0; }
+  .rv__stage { display: grid; place-items: center; overflow: hidden; border-radius: 24px; }
+  .rv__stage :global(video), .rv__stage :global(img), .rv__stage :global(svg) {
+    display: block;
+    max-width: min(100%, 860px);
+    max-height: calc(100svh - 150px);
+    width: auto;
+    background: #000;
+  }
+  .rv__stage :global(svg) { height: calc(100svh - 150px); aspect-ratio: 3 / 4; }
+  figcaption { max-width: 40rem; text-align: center; color: var(--text-on-dark-muted); }
+  figcaption .accent { display: block; font-size: 1.5rem; color: var(--paper); }
+
+  @media (max-width: 760px) {
+    .rv[open] { flex-wrap: wrap; align-content: center; }
+    .rv__body { order: -1; flex: 0 0 100%; }
+    .rv__stage :global(video), .rv__stage :global(img), .rv__stage :global(svg) { max-height: calc(100svh - 230px); }
+    .rv__stage :global(svg) { height: calc(100svh - 230px); max-width: 100%; }
+  }
+</style>

@@ -1,0 +1,26 @@
+---
+import { getCollection } from 'astro:content';
+import FinalCta from '../../components/FinalCta.astro';
+import PageHero from '../../components/PageHero.astro';
+import TourCard from '../../components/TourCard.astro';
+import { tripTypes } from '../../data/content';
+import Page from '../../layouts/Page.astro';
+
+export function getStaticPaths() {
+  return tripTypes.map((t) => ({ params: { type: t.slug }, props: { t } }));
+}
+const { t } = Astro.props as { t: (typeof tripTypes)[number] };
+const tours = (await getCollection('tours')).filter((x) => x.data.types.includes(t.slug));
+const message = `Hi CHS Tours, I'd like help planning a ${t.label.toLowerCase()} trip.`;
+---
+<Page title={`${t.label} holidays | CHS Tours`} description={t.intro} whatsappMessage={message}>
+  <PageHero title={`${t.label} trips`} accent={t.accent} intro={t.intro} scene={t.scene} />
+  <section class="section section--tight">
+    <ul class="grid">{tours.map((x) => <li><TourCard tour={x} /></li>)}</ul>
+  </section>
+  <FinalCta message={message} />
+</Page>
+
+<style>
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 28px 18px; }
+</style>

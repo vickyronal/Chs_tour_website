@@ -1,0 +1,106 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import ReviewViewer from './ReviewViewer.astro';
+import Scene from './Scene.astro';
+
+interface Props {
+  reviews: CollectionEntry<'reviews'>[];
+  filters?: boolean;
+}
+const { reviews, filters = false } = Astro.props;
+const shapes = ['4 / 5', '1 / 1', '4 / 3.4', '3 / 4', '4 / 4.6', '4 / 3.2'];
+const options = [['all', 'All'], ['photo', 'Photos'], ['video', 'Videos']];
+---
+{filters && (
+  <div class="rg-filter" role="group" aria-label="Show" data-rg-filter hidden>
+    {options.map(([value, label], i) => (
+      <button type="button" data-kind={value} aria-pressed={i === 0 ? 'true' : 'false'}>{label}</button>
+    ))}
+  </div>
+)}
+
+<ul class="rg">
+  {reviews.map((review, i) => {
+    const r = review.data;
+    const label = `${r.type === 'video' ? 'Play video from' : 'Open photo from'} ${r.name}, ${r.trip}`;
+    return (
+      <li data-tile={r.type}>
+        <a
+          class="ui-card tile"
+          href={r.src ?? '/reviews'}
+          aria-label={label}
+          data-open
+          data-type={r.type}
+          data-src={r.src}
+          data-poster={r.poster}
+          data-caption={`${r.name}, ${r.trip}`}
+          data-quote={r.quote}
+        >
+          <span class="ui-card__media" data-media style={`--card-ratio: ${shapes[i % shapes.length]}`}>
+            {r.scene && !r.poster && !(r.type === 'photo' && r.src) && <Scene name={r.scene} />}
+            {(r.poster || (r.type === 'photo' && r.src)) && <img src={r.poster ?? r.src!} alt="" loading="lazy" />}
+            {!r.verified && <span class="ui-card__badge">Sample</span>}
+            {r.type === 'video' && <span class="tile__play" aria-hidden="true"><svg width="20" height="22" viewBox="0 0 20 22"><path d="M2 1.8v18.4L18.5 11z" fill="currentColor" /></svg></span>}
+          </span>
+          <span class="ui-card__body">
+            <span class="ui-card__title">{r.quote}</span>
+            <span class="ui-card__meta">{r.name}, {r.trip}</span>
+          </span>
+        </a>
+      </li>
+    );
+  })}
+</ul>
+
+<ReviewViewer />
+
+<script>
+  // Filter pills: All, Photos, Videos
+  const filter = document.querySelector<HTMLElement>('[data-rg-filter]');
+  if (filter) {
+    filter.hidden = false;
+    const buttons = [...filter.querySelectorAll<HTMLButtonElement>('[data-kind]')];
+    buttons.forEach((b) => b.addEventListener('click', () => {
+      buttons.forEach((o) => o.setAttribute('aria-pressed', String(o === b)));
+      document.querySelectorAll<HTMLElement>('[data-tile]').forEach((li) => {
+        li.hidden = b.dataset.kind !== 'all' && li.dataset.tile !== b.dataset.kind;
+      });
+    }));
+  }
+</script>
+
+<style>
+  .rg-filter { display: flex; gap: 6px; margin-bottom: 20px; }
+  .rg-filter[hidden] { display: none; }
+  .rg-filter button {
+    min-height: 44px;
+    padding: 0 20px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: var(--paper);
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .rg-filter [aria-pressed='true'] { background: var(--ink); color: var(--paper); }
+
+  .rg { columns: 3 260px; column-gap: 14px; }
+  .rg li { break-inside: avoid; margin-bottom: 14px; }
+  .rg li[hidden] { display: none; }
+  .tile__play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    display: grid;
+    place-items: center;
+    width: 68px;
+    height: 68px;
+    padding-left: 4px;
+    border-radius: 50%;
+    background: var(--red);
+    color: #fff;
+    transition: scale 0.35s var(--ease);
+  }
+  .tile__play svg { width: 20px; height: 22px; }
+  @media (hover: hover) and (pointer: fine) { .tile:hover .tile__play { scale: 1.08; } }
+</style>

@@ -1,0 +1,22 @@
+---
+const { items } = Astro.props as { items: { q: string; a: string }[] };
+---
+<div class="faq">
+  {items.map((f) => (
+    <details>
+      <summary>{f.q}</summary>
+      <p>{f.a}</p>
+    </details>
+  ))}
+</div>
+
+<style>
+  .faq { display: grid; gap: 8px; }
+  details { border-radius: var(--radius-card); background: var(--card-bg); }
+  summary {
+    padding: 18px 24px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  p { padding: 0 24px 20px; color: var(--text-muted); }
+</style>

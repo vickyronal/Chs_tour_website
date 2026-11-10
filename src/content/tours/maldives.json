@@ -1,0 +1,72 @@
+{
+  "title": "Maldives Island Escape",
+  "summary": "White sand, clear water and slow days on a single island.",
+  "destination": "maldives",
+  "types": [
+    "honeymoon",
+    "family"
+  ],
+  "scene": "maldives",
+  "days": 5,
+  "nights": 4,
+  "bestTime": "November to April",
+  "stay": "Island resort, confirmed when you book",
+  "transport": "Flights and resort speedboat transfers",
+  "money": "Local currency is the Maldivian rufiyaa.",
+  "route": [
+    "Malé",
+    "Resort island",
+    "Malé"
+  ],
+  "highlights": [
+    "Stay on a private resort island",
+    "Snorkelling over the house reef",
+    "Sunset boat trip",
+    "Free time on the beach"
+  ],
+  "itinerary": [
+    {
+      "day": 1,
+      "title": "Arrive in Malé",
+      "description": "Speedboat transfer to your resort island."
+    },
+    {
+      "day": 2,
+      "title": "Island day",
+      "description": "Free time on the beach and in the water."
+    },
+    {
+      "day": 3,
+      "title": "Snorkelling",
+      "description": "A guided snorkel trip over the reef."
+    },
+    {
+      "day": 4,
+      "title": "Sunset cruise",
+      "description": "A free day, then an evening boat trip."
+    },
+    {
+      "day": 5,
+      "title": "Departure",
+      "description": "Speedboat back to Malé for your flight home."
+    }
+  ],
+  "included": [
+    "Return flights",
+    "4 nights in an island resort",
+    "Daily breakfast",
+    "Speedboat transfers",
+    "Snorkel trip and sunset cruise"
+  ],
+  "excluded": [
+    "Travel insurance",
+    "Meals not listed",
+    "Personal expenses"
+  ],
+  "fromPrice": 110000,
+  "notes": [],
+  "featured": true,
+  "verified": false,
+  "visa": "We handle the visa process and tell you what we need from you. The final decision rests with the authorities.",
+  "flights": "Return flights are included."
+}

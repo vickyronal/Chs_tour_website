@@ -1,0 +1,70 @@
+---
+const links = [
+  { label: 'Home', href: '/' },
+  { label: 'Tours', href: '/tours' },
+  { label: 'Destinations', href: '/destinations' },
+  { label: 'About', href: '/about' },
+  { label: 'Contact', href: '/contact' },
+];
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isCurrent = (href: string) => (href === '/' ? path === '/' : path === href || path.startsWith(`${href}/`));
+---
+<header class="header">
+  <a class="header__logo" href="/" aria-label="CHS Tours home">
+    <img src="/brand/logo.png" alt="" width="101" height="51" />
+  </a>
+  <nav class="header__nav" aria-label="Main">
+    {links.map((l) => <a href={l.href} aria-current={isCurrent(l.href) ? 'page' : undefined}>{l.label}</a>)}
+  </nav>
+  <div class="header__actions">
+    <button class="round" type="button" data-menu-open aria-label="Open menu" aria-haspopup="dialog">
+      <svg width="20" height="14" viewBox="0 0 20 14" fill="none" aria-hidden="true">
+        <path d="M1 2h18M1 12h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+      </svg>
+    </button>
+  </div>
+</header>
+
+<style>
+  .header {
+    position: absolute;
+    inset: var(--frame-gap) var(--frame-gap) auto;
+    z-index: 5;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 16px;
+    padding: clamp(14px, 2vw, 24px) clamp(14px, 2.6vw, 34px);
+  }
+  .header__logo { justify-self: start; }
+  .header__logo img { width: clamp(77px, 7.2vw, 101px); height: auto; }
+  .header__nav {
+    display: flex;
+    gap: 2px;
+    padding: 5px;
+    border-radius: var(--radius-pill);
+    background: var(--paper);
+  }
+  .header__nav a {
+    padding: 10px 22px;
+    border-radius: var(--radius-pill);
+    font-size: 1rem;
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--ink);
+    transition: background-color 0.25s;
+  }
+  .header__nav a:hover { background: var(--fog); }
+  .header__nav a[aria-current='page'] { background: var(--ink); color: var(--paper); }
+  .header__actions {
+    justify-self: end;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  @media (max-width: 860px) {
+    .header { grid-template-columns: 1fr auto; }
+    .header__nav { display: none; }
+  }
+</style>

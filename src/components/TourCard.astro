@@ -1,0 +1,24 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Scene from './Scene.astro';
+import { formatPrice } from '../lib/enquiry';
+
+interface Props {
+  tour: CollectionEntry<'tours'>;
+  size?: 'tall' | 'mid' | 'short';
+}
+const { tour, size = 'mid' } = Astro.props;
+const t = tour.data;
+const ratio = { tall: '4 / 5', mid: '4 / 4.2', short: '4 / 3.4' }[size];
+---
+<a class="ui-card" href={`/tours/${tour.id}`} style={`--card-ratio: ${ratio}`}>
+  <span class="ui-card__media">
+    <Scene name={t.scene} sizes="(max-width: 760px) 70vw, 340px" />
+    {!t.verified && <span class="ui-card__badge">Sample</span>}
+  </span>
+  <span class="ui-card__body">
+    <span class="ui-card__title">{t.title}</span>
+    <span class="ui-card__meta">{t.days} days, {t.nights} nights</span>
+    <span class="ui-card__price">{formatPrice(t.fromPrice)}</span>
+  </span>
+</a>

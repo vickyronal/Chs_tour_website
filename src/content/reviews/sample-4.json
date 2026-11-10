@@ -1,0 +1,11 @@
+{
+  "type": "photo",
+  "src": null,
+  "poster": null,
+  "scene": "bali",
+  "name": "Traveller name",
+  "trip": "Trip name",
+  "quote": "The traveller's own words go here.",
+  "permission": "None: sample tile",
+  "verified": false
+}

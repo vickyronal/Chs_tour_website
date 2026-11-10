@@ -1,0 +1,134 @@
+---
+import { getCollection } from 'astro:content';
+import Arrow from '../components/Arrow.astro';
+import Destinations from '../components/Destinations.astro';
+import FaqList from '../components/FaqList.astro';
+import FinalCta from '../components/FinalCta.astro';
+import HeroExpand from '../components/HeroExpand.astro';
+import Planner from '../components/Planner.astro';
+import TravellerStories from '../components/TravellerStories.astro';
+import TourCard from '../components/TourCard.astro';
+import { faqs, tripTypes } from '../data/content';
+import Page from '../layouts/Page.astro';
+
+const featured = (await getCollection('tours')).filter((t) => t.data.featured);
+const reviews = await getCollection('reviews');
+const sizes = ['tall', 'short', 'mid', 'tall', 'short', 'mid'] as const;
+---
+<Page
+  title="CHS Tours | Philippines, Bali, Maldives and Sri Lanka holidays"
+  description="Holidays to the Philippines, Bali, the Maldives and Sri Lanka, with flights and visa handled, planned with a real person at CHS Tours in Chennai. Tell us where you'd like to go on WhatsApp or by phone."
+>
+  <HeroExpand />
+  <Destinations />
+
+  <section class="packages" aria-labelledby="packages-title">
+    <div class="packages__head">
+      <h2 class="section-title" id="packages-title">Trips to <span class="accent">start from.</span></h2>
+      <a class="btn btn--ghost" href="/tours">See all tours</a>
+    </div>
+    <ul class="packages__row">
+      {featured.map((tour, i) => <li><TourCard tour={tour} size={sizes[i % sizes.length]} /></li>)}
+    </ul>
+  </section>
+
+  <section class="section section--tight" aria-labelledby="types-title">
+    <h2 class="section-title" id="types-title">Who's <span class="accent">travelling?</span></h2>
+    <ul class="types">
+      {tripTypes.map((t) => (
+        <li>
+          <a class="type" href={`/trips/${t.slug}`}>
+            <img class="scene" src={t.photo} alt="" width="640" height="800" loading="lazy" decoding="async" style={`object-position: ${t.focus}`} />
+            <span class="type__text">
+              <span class="type__label">{t.label}</span>
+              <span class="accent">{t.accent}</span>
+            </span>
+            <span class="type__arrow" aria-hidden="true"><Arrow /></span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <Planner />
+
+
+  {reviews.length > 0 && <TravellerStories reviews={reviews} />}
+
+  <section class="section faq-preview" aria-labelledby="faq-title">
+    <div>
+      <h2 class="section-title" id="faq-title">Good <span class="accent">questions.</span></h2>
+      <a class="btn btn--ghost" href="/faq">All questions</a>
+    </div>
+    <FaqList items={faqs.slice(0, 4)} />
+  </section>
+
+  <FinalCta />
+</Page>
+
+<style>
+  .packages { padding-block: 32px clamp(40px, 6vw, 72px); }
+  .packages__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    padding-inline: var(--gutter);
+    margin-bottom: 28px;
+  }
+  .packages__row {
+    display: flex;
+    align-items: flex-start;
+    gap: clamp(12px, 1.6vw, 20px);
+    padding-inline: var(--gutter);
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: var(--gutter);
+    scrollbar-width: none;
+  }
+  .packages__row li { flex: 0 0 clamp(240px, 24vw, 340px); scroll-snap-align: start; padding-top: 6px; }
+
+  .types { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 28px; }
+  .type {
+    position: relative;
+    display: block;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    border-radius: 28px;
+    color: var(--paper);
+    text-decoration: none;
+  }
+  .type > :global(img) { position: absolute; inset: 0; }
+  .type__text {
+    position: absolute;
+    inset: auto 0 0;
+    display: grid;
+    padding: 72px 22px 22px;
+    background: linear-gradient(to bottom, rgb(13 16 20 / 0), rgb(13 16 20 / 0.82) 55%);
+    font-size: 1.25rem;
+  }
+  .type__label { font-size: clamp(1.75rem, 3vw, 2.5rem); font-stretch: 85%; font-weight: 600; letter-spacing: -0.03em; line-height: 1.05; }
+  .type__arrow {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .type__arrow :global(svg) { width: 18px; height: 18px; }
+
+  .faq-preview { display: grid; grid-template-columns: 1fr 1.6fr; gap: 32px; }
+  .faq-preview .btn { margin-top: 20px; }
+
+  @media (max-width: 760px) {
+    .packages__row li { flex-basis: 70vw; }
+    .types, .faq-preview { grid-template-columns: 1fr; }
+    .type { aspect-ratio: 4 / 3.4; }
+  }
+</style>

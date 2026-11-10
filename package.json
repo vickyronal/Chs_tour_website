@@ -1,0 +1,36 @@
+{
+  "name": "chs-tours",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro preview",
+    "build:launch": "node scripts/check-placeholders.mjs && npm run build",
+    "hero": "node scripts/hero-assets.mjs",
+    "brand": "node scripts/brand-assets.mjs",
+    "photos": "node scripts/photo-assets.mjs"
+  },
+  "dependencies": {
+    "@astrojs/react": "^7.1.4",
+    "@fontsource-variable/instrument-sans": "^5.3.0",
+    "@fontsource/caveat": "^5.3.0",
+    "@fontsource/instrument-serif": "^5.3.0",
+    "astro": "^7.4.7",
+    "clsx": "^2.1.1",
+    "framer-motion": "^14.10.1",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "tailwind-merge": "^3.7.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "@tailwindcss/vite": "^4.3.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "sharp": "^0.35.5",
+    "tailwindcss": "^4.3.5",
+    "typescript": "^6.0.3"
+  }
+}

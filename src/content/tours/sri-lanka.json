@@ -1,0 +1,79 @@
+{
+  "title": "Sri Lanka Hills and Coast",
+  "summary": "Kandy's temples, misty tea country and a few easy days by the sea.",
+  "destination": "sri-lanka",
+  "types": [
+    "family",
+    "group"
+  ],
+  "scene": "sri-lanka",
+  "days": 6,
+  "nights": 5,
+  "bestTime": "December to March",
+  "stay": "Hill and beach hotels, confirmed when you book",
+  "transport": "Flights and a private car with driver",
+  "money": "Local currency is the Sri Lankan rupee.",
+  "route": [
+    "Colombo",
+    "Kandy",
+    "Nuwara Eliya",
+    "Bentota",
+    "Colombo"
+  ],
+  "highlights": [
+    "Temple of the Tooth in Kandy",
+    "Tea country around Nuwara Eliya",
+    "A tea factory visit",
+    "Beach time in Bentota"
+  ],
+  "itinerary": [
+    {
+      "day": 1,
+      "title": "Arrive in Colombo",
+      "description": "Meet your driver and travel to Kandy."
+    },
+    {
+      "day": 2,
+      "title": "Kandy",
+      "description": "Temple of the Tooth and a walk around the lake."
+    },
+    {
+      "day": 3,
+      "title": "Nuwara Eliya",
+      "description": "Drive into tea country, with a tea factory stop."
+    },
+    {
+      "day": 4,
+      "title": "To the coast",
+      "description": "A long, scenic drive down to Bentota."
+    },
+    {
+      "day": 5,
+      "title": "Bentota",
+      "description": "A free day at the beach."
+    },
+    {
+      "day": 6,
+      "title": "Departure",
+      "description": "Transfer to Colombo for your flight home."
+    }
+  ],
+  "included": [
+    "Return flights",
+    "5 nights in hotels",
+    "Daily breakfast",
+    "Private car with driver",
+    "Sightseeing as listed"
+  ],
+  "excluded": [
+    "Travel insurance",
+    "Entry tickets not listed",
+    "Personal expenses"
+  ],
+  "fromPrice": 58000,
+  "notes": [],
+  "featured": true,
+  "verified": false,
+  "visa": "We handle the visa process and tell you what we need from you. The final decision rests with the authorities.",
+  "flights": "Return flights are included."
+}

@@ -1,0 +1,40 @@
+:root {
+  /* Grounds */
+  --stone: #ece8e1;
+  --fog: #d9dcda;
+  --paper: #f7f5f1;
+
+  /* Dark */
+  --ink: #14171c;
+  --dusk: #2a3450;
+
+  /* Tint and accent. Red is the only vivid colour on the site. */
+  --sky-slate: #93abc3;
+  --red: #ee2124;
+
+  /* Text */
+  --text: var(--ink);
+  --text-muted: #565b61; /* 5.4:1 on stone */
+  --text-on-dark: #f7f5f1;
+  --text-on-dark-muted: #c6c9cd;
+
+  /* Type */
+  --font-sans: 'Instrument Sans Variable', system-ui, sans-serif;
+  --font-accent: 'Instrument Serif', Georgia, serif;
+
+  /* Shape */
+  --radius-frame: clamp(28px, 3vw, 40px);
+  --radius-pill: 999px;
+
+  /* Cards: one shape everywhere (see .ui-card in global.css) */
+  --card-bg: var(--paper);
+  --radius-card: 30px;
+  --radius-card-inner: 22px;
+  --card-pad: 8px;
+  --tap: 48px;
+  --gutter: clamp(16px, 4vw, 56px);
+  --frame-gap: clamp(8px, 1vw, 14px);
+
+  /* Motion */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}

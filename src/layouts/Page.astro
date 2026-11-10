@@ -1,0 +1,22 @@
+---
+import Base from './Base.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import Menu from '../components/Menu.astro';
+import StickyBar from '../components/StickyBar.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  noindex?: boolean;
+  whatsappMessage?: string;
+}
+const { title, description, noindex, whatsappMessage } = Astro.props;
+---
+<Base title={title} description={description} noindex={noindex}>
+  <Header />
+  <main id="main"><slot /></main>
+  <Footer />
+  <StickyBar message={whatsappMessage} />
+  <Menu />
+</Base>

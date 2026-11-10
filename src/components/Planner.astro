@@ -1,0 +1,315 @@
+---
+import Arrow from './Arrow.astro';
+import { destinations } from '../data/destinations';
+import { whatsappLink } from '../lib/enquiry';
+
+const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'Not sure yet'];
+const groups = ['Just me', 'Two of us', '3 to 4', '5 to 8', '9 or more'];
+const steps = ['Where', 'When', 'Who', 'Your trip'];
+const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
+---
+<section class="planner" id="plan" aria-labelledby="plan-title">
+  <div class="planner__head">
+    <h2 class="section-title" id="plan-title">Plan your trip <span class="accent">in four steps.</span></h2>
+    <p class="section-intro">Tell us the basics. A real person at CHS takes it from there and shapes the trip with you.</p>
+  </div>
+
+  <ol class="planner__steps" data-steps hidden>
+    {steps.map((s, i) => (
+      <li><button type="button" data-goto={i}><span>{i + 1}</span> {s}</button></li>
+    ))}
+  </ol>
+
+  <form class="planner__form" data-planner action="/api/enquiry" method="post">
+    <fieldset data-step="0">
+      <legend>Where would you like to go?</legend>
+      <div class="opts">
+        {[...destinations.map((d) => d.name), 'Somewhere else'].map((name) => (
+          <label class="opt"><input type="radio" name="where" value={name} /><span>{name}</span></label>
+        ))}
+      </div>
+    </fieldset>
+
+    <fieldset data-step="1">
+      <legend>Roughly when?</legend>
+      <div class="opts">
+        {months.map((m) => <label class="opt"><input type="radio" name="when" value={m} /><span>{m}</span></label>)}
+      </div>
+    </fieldset>
+
+    <fieldset data-step="2">
+      <legend>How many of you are travelling?</legend>
+      <div class="opts">
+        {groups.map((g) => <label class="opt"><input type="radio" name="who" value={g} /><span>{g}</span></label>)}
+      </div>
+    </fieldset>
+
+    <fieldset data-step="3">
+      <legend>Your trip</legend>
+      <p class="summary" data-summary hidden></p>
+      <div class="fields">
+        <label>Your name <input name="name" autocomplete="name" required maxlength="100" /></label>
+        <label>WhatsApp number <input name="whatsapp" type="tel" autocomplete="tel" required pattern="[+0-9][0-9 \-]{6,20}" placeholder="+91" /></label>
+        <label>Email (optional) <input name="email" type="email" autocomplete="email" /></label>
+        <label class="fields__wide">Anything else? (optional) <textarea name="note" rows="2" maxlength="1000"></textarea></label>
+      </div>
+      <label class="consent">
+        <input type="checkbox" name="consent" required />
+        <span>CHS Tours may contact me about this trip. See our <a href="/privacy">privacy page</a>.</span>
+      </label>
+      <input class="trap" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+      <input type="hidden" name="tour" />
+      {siteKey && <div class="cf-turnstile" data-sitekey={siteKey}></div>}
+      <div class="send">
+        <a class="btn" data-send-whatsapp href={whatsappLink()}>
+          Send on WhatsApp
+          <span class="btn__arrow"><Arrow /></span>
+        </a>
+        <button class="btn btn--ghost" type="submit" data-submit>Send to CHS</button>
+      </div>
+    </fieldset>
+
+    <div class="planner__nav" data-nav hidden>
+      <button class="round" type="button" data-back aria-label="Previous step"><span class="flip"><Arrow /></span></button>
+      <button class="btn" type="button" data-next>Next <span class="btn__arrow"><Arrow /></span></button>
+    </div>
+
+    <div class="planner__error" role="alert" data-error hidden>
+      <p><strong>Sorry, that didn't reach us.</strong> Nothing has been sent. Please send it on WhatsApp instead, with your details already filled in.</p>
+      <a class="btn" data-error-whatsapp href={whatsappLink()}>Send on WhatsApp <span class="btn__arrow"><Arrow /></span></a>
+    </div>
+  </form>
+
+  <p class="planner__direct">Prefer to just talk? <a data-direct href={whatsappLink()}>Message us on WhatsApp</a>.</p>
+</section>
+{siteKey && <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>}
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-planner]');
+  if (form) {
+    const number = new URL(form.querySelector<HTMLAnchorElement>('[data-send-whatsapp]')!.href).pathname;
+    const steps = [...form.querySelectorAll<HTMLElement>('[data-step]')];
+    const pills = [...document.querySelectorAll<HTMLButtonElement>('[data-goto]')];
+    const nav = form.querySelector<HTMLElement>('[data-nav]')!;
+    const next = form.querySelector<HTMLButtonElement>('[data-next]')!;
+    const back = form.querySelector<HTMLButtonElement>('[data-back]')!;
+    const summary = form.querySelector<HTMLElement>('[data-summary]')!;
+    const error = form.querySelector<HTMLElement>('[data-error]')!;
+    const submit = form.querySelector<HTMLButtonElement>('[data-submit]')!;
+    let current = 0;
+
+    const value = (name: string) => (new FormData(form).get(name) as string | null)?.trim() ?? '';
+
+    const message = () => {
+      const lines = ["Hi CHS Tours, I'd like help planning a trip."];
+      const add = (label: string, v: string) => v && lines.push(`${label}: ${v}`);
+      add('Tour', value('tour'));
+      add('Where', value('where'));
+      add('When', value('when'));
+      add('Travellers', value('who'));
+      add('Name', value('name'));
+      add('Note', value('note'));
+      return lines.join('\n');
+    };
+    const waUrl = () => `https://wa.me${number}?text=${encodeURIComponent(message())}`;
+
+    const refresh = () => {
+      form.querySelectorAll<HTMLAnchorElement>('[data-send-whatsapp], [data-error-whatsapp]').forEach((a) => (a.href = waUrl()));
+      const direct = document.querySelector<HTMLAnchorElement>('[data-direct]');
+      if (direct) direct.href = waUrl();
+      const parts = [value('tour') || value('where'), value('when'), value('who')].filter(Boolean);
+      summary.hidden = !parts.length;
+      summary.textContent = parts.join(' · ');
+    };
+
+    const show = (index: number, focus = true) => {
+      current = index;
+      steps.forEach((s, i) => (s.hidden = i !== index));
+      pills.forEach((p, i) => {
+        if (i === index) p.setAttribute('aria-current', 'step');
+        else p.removeAttribute('aria-current');
+      });
+      back.hidden = index === 0;
+      next.hidden = index === steps.length - 1;
+      refresh();
+      if (focus) steps[index].querySelector<HTMLElement>('input')?.focus({ preventScroll: true });
+    };
+
+    document.querySelector<HTMLElement>('[data-steps]')!.hidden = false;
+    nav.hidden = false;
+    pills.forEach((p, i) => p.addEventListener('click', () => show(i)));
+    next.addEventListener('click', () => show(Math.min(current + 1, steps.length - 1)));
+    back.addEventListener('click', () => show(Math.max(current - 1, 0)));
+    form.addEventListener('input', refresh);
+
+    // Tapping an option moves on by itself; keyboard arrows only change the choice
+    let tapped = false;
+    form.addEventListener('pointerdown', () => (tapped = true));
+    form.addEventListener('keydown', () => (tapped = false));
+    form.addEventListener('change', (event) => {
+      const isOption = (event.target as HTMLElement).closest('.opt');
+      if (isOption && tapped && current < steps.length - 1) window.setTimeout(() => show(current + 1), 180);
+    });
+
+    // Pre-fill from links such as /contact?where=Kerala&tour=Kerala%20Backwaters#plan
+    const params = new URLSearchParams(location.search);
+    const where = params.get('where');
+    const tour = params.get('tour');
+    if (tour) form.querySelector<HTMLInputElement>('[name=tour]')!.value = tour;
+    let start = 0;
+    if (where) {
+      const option = [...form.querySelectorAll<HTMLInputElement>('[name=where]')].find((i) => i.value === where);
+      if (option) {
+        option.checked = true;
+        start = 1;
+      }
+    }
+    show(start, false);
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+      error.hidden = true;
+      submit.disabled = true;
+      submit.textContent = 'Sending…';
+      const data = Object.fromEntries(new FormData(form));
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            ...data,
+            consent: data.consent === 'on',
+            turnstile: data['cf-turnstile-response'],
+            page: location.pathname,
+            source: params.get('utm_source') ?? document.referrer,
+          }),
+        });
+        const result = await res.json().catch(() => null);
+        if (res.ok && result?.ok) {
+          location.assign('/thank-you');
+          return;
+        }
+        throw new Error('not delivered');
+      } catch {
+        refresh();
+        error.hidden = false;
+        submit.disabled = false;
+        submit.textContent = 'Try again';
+      }
+    });
+  }
+</script>
+
+<style>
+  .planner {
+    max-width: 1000px;
+    margin-inline: auto;
+    padding: clamp(56px, 8vw, 104px) var(--gutter);
+    scroll-margin-top: 8px;
+  }
+  .planner__steps {
+    display: flex;
+    gap: 6px;
+    margin: 28px 0 12px;
+    padding: 0;
+    list-style: none;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .planner__steps[hidden] { display: none; }
+  .planner__steps button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 48px;
+    padding: 0 18px 0 8px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: var(--paper);
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .planner__steps span {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--stone);
+    font-size: 0.9375rem;
+  }
+  .planner__steps [aria-current='step'] { background: var(--ink); color: var(--paper); }
+  .planner__steps [aria-current='step'] span { background: var(--red); color: #fff; }
+  .planner__form {
+    display: grid;
+    gap: 20px;
+    margin-top: 12px;
+    padding: clamp(20px, 3.5vw, 40px);
+    border-radius: var(--radius-card);
+    background: var(--card-bg);
+  }
+  fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+  fieldset[hidden] { display: none; }
+  legend {
+    margin-bottom: 18px;
+    padding: 0;
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    font-stretch: 85%;
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+  }
+  .opts { display: flex; flex-wrap: wrap; gap: 8px; }
+  .opt input { position: absolute; opacity: 0; }
+  .opt span {
+    display: grid;
+    place-items: center;
+    min-height: 48px;
+    padding: 0 20px;
+    border-radius: var(--radius-pill);
+    background: var(--stone);
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .opt input:checked + span { background: var(--ink); color: var(--paper); }
+  .opt input:focus-visible + span { outline: 3px solid var(--red); outline-offset: 2px; }
+  .summary { margin-bottom: 16px; font-family: var(--font-accent); font-style: italic; font-size: 1.5rem; }
+  .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .fields__wide { grid-column: 1 / -1; }
+  .fields label { display: grid; gap: 4px; font-weight: 500; }
+  .fields input, .fields textarea {
+    width: 100%;
+    min-height: 48px;
+    padding: 10px 16px;
+    border: 1.5px solid #8a8f94;
+    border-radius: 16px;
+    background: #fff;
+    font: inherit;
+  }
+  .consent { display: flex; gap: 10px; align-items: flex-start; margin-top: 14px; }
+  .consent input { width: 22px; height: 22px; margin: 2px 0 0; flex: none; accent-color: var(--ink); }
+  .trap { position: absolute; left: -9999px; }
+  .send { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+  .planner__nav { display: flex; justify-content: space-between; align-items: center; }
+  .planner__nav[hidden] { display: none; }
+  .planner__nav > [data-next] { margin-left: auto; }
+  .planner__nav [hidden] { display: none; }
+  .round { background: var(--stone); }
+  .flip { display: block; transform: scaleX(-1); }
+  .planner__error {
+    display: grid;
+    justify-items: start;
+    gap: 12px;
+    padding: 18px 20px;
+    border: 2px solid var(--red);
+    border-radius: 20px;
+  }
+  .planner__error[hidden] { display: none; }
+  .planner__direct { margin-top: 16px; text-align: center; color: var(--text-muted); }
+
+  @media (max-width: 760px) {
+    .fields { grid-template-columns: 1fr; }
+  }
+</style>

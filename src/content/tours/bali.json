@@ -1,0 +1,79 @@
+{
+  "title": "Bali Terraces and Temples",
+  "summary": "Rice terraces in Ubud, sea temples at sunset and slow days by the beach.",
+  "destination": "bali",
+  "types": [
+    "honeymoon",
+    "family"
+  ],
+  "scene": "bali",
+  "days": 6,
+  "nights": 5,
+  "bestTime": "April to October",
+  "stay": "Ubud and beach hotels, confirmed when you book",
+  "transport": "Private car with driver",
+  "route": [
+    "Denpasar",
+    "Ubud",
+    "Tanah Lot",
+    "Seminyak",
+    "Denpasar"
+  ],
+  "highlights": [
+    "Tegallalang rice terraces",
+    "Sunset at Tanah Lot temple",
+    "Ubud art market",
+    "Free beach day in Seminyak"
+  ],
+  "itinerary": [
+    {
+      "day": 1,
+      "title": "Arrive in Bali",
+      "description": "Transfer to Ubud and a free evening."
+    },
+    {
+      "day": 2,
+      "title": "Ubud",
+      "description": "Rice terraces, a temple visit and the art market."
+    },
+    {
+      "day": 3,
+      "title": "Central Bali",
+      "description": "A day trip into the highlands and lake temples."
+    },
+    {
+      "day": 4,
+      "title": "Tanah Lot",
+      "description": "Move to the coast, stopping at Tanah Lot for sunset."
+    },
+    {
+      "day": 5,
+      "title": "Seminyak",
+      "description": "A free day at the beach."
+    },
+    {
+      "day": 6,
+      "title": "Departure",
+      "description": "Transfer to the airport."
+    }
+  ],
+  "included": [
+    "Return flights",
+    "5 nights in hotels",
+    "Daily breakfast",
+    "Private car with driver for sightseeing",
+    "Airport transfers"
+  ],
+  "excluded": [
+    "Travel insurance",
+    "Temple donations",
+    "Personal expenses"
+  ],
+  "fromPrice": 75000,
+  "notes": [],
+  "featured": true,
+  "verified": false,
+  "visa": "We handle the visa process and tell you what we need from you. The final decision rests with the authorities.",
+  "flights": "Return flights are included.",
+  "money": "Local currency is the Indonesian rupiah."
+}
