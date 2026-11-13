@@ -1,7 +1,8 @@
 ---
-// Homepage hero: the plane-window sky fades while the travel video fades in and
-// expands to fill the screen; then the intro and the rest of the page follow.
+// Homepage hero: the plane-window sky fades while the "Who's travelling?" cards fade
+// in and expand to fill the screen; then the intro and the rest of the page follow.
 import Arrow from './Arrow.astro';
+import WhoTravelling from './WhoTravelling.astro';
 import ScrollExpandMedia from '@/components/ui/scroll-expansion-hero';
 import { company } from '../data/company';
 import { telLink, whatsappLink } from '../lib/enquiry';
@@ -9,15 +10,14 @@ import { telLink, whatsappLink } from '../lib/enquiry';
 <div class="hx">
   <ScrollExpandMedia
     client:load
-    mediaType="video"
-    mediaSrc="/hero/reveal.webm"
-    posterSrc="/hero/reveal-poster.webp"
+    mediaType="custom"
     revealOnScroll
     bgImageSrc="/hero/hero-sky.webp"
     titleSplit={['Go anywhere,', 'with someone to call.']}
     date="Philippines · Bali · Maldives · Sri Lanka"
     scrollToExpand="Scroll to arrive"
   >
+    <WhoTravelling slot="media" />
     <div class="hx__foot">
       <div class="hero__intro">
         <p>Philippines, Bali, Maldives and Sri Lanka, planned with a real person at our Chennai office. Flights and visa handled.</p>
@@ -116,6 +116,15 @@ import { telLink, whatsappLink } from '../lib/enquiry';
 
   @media (max-width: 760px) {
     .hx__card { width: 100%; }
+    /* Headline sits in the open sky below the header, clear of the wingtip */
+    .hx :global(h1) { transform: translateY(calc(150px - 50dvh)); }
+    .hx :global(.sx-title) { font-size: clamp(2.75rem, 13vw, 3.5rem); }
+    .hx :global(.sx-title--accent) { font-size: clamp(1.875rem, 8.6vw, 2.375rem); }
+    .hx :global(.sx-date) { font-size: 1.0625rem; }
+    /* Intro under the hero: less empty space, full-width tap targets */
+    .hx :global(section section) { padding-top: 8px; }
+    .hero__intro { max-width: none; }
+    .hero__intro .btn { width: 100%; justify-content: space-between; }
   }
   /* Short phones: the hint would sit under the WhatsApp bar */
   @media (max-width: 760px) and (max-height: 700px) {

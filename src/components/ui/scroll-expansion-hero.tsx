@@ -7,14 +7,18 @@
  *   and a link to a later part of the page expands it straight away
  * - optional reveal: the frame starts invisible and fades in as it grows
  * - video loads only once scrolling starts, and has a pause button when expanded
+ * - mediaType "custom" shows the `media` slot in the frame with the same reveal;
+ *   it stays unclickable and out of the tab order until fully expanded
  */
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface ScrollExpandMediaProps {
-  mediaType?: 'video' | 'image';
-  mediaSrc: string;
+  mediaType?: 'video' | 'image' | 'custom';
+  /** Frame content when mediaType is "custom" (an Astro slot named "media"). */
+  media?: ReactNode;
+  mediaSrc?: string;
   mediaAlt?: string;
   posterSrc?: string;
   bgImageSrc: string;
@@ -32,6 +36,7 @@ interface ScrollExpandMediaProps {
 
 const ScrollExpandMedia = ({
   mediaType = 'video',
+  media,
   mediaSrc,
   mediaAlt,
   posterSrc,
@@ -217,6 +222,12 @@ const ScrollExpandMedia = ({
   const mediaWidth = 300 + scrollProgress * (isMobileState ? 650 : 1250);
   const mediaHeight = 400 + scrollProgress * (isMobileState ? 200 : 400);
   const textTranslateX = scrollProgress * (isMobileState ? 180 : 150);
+  // Desktop: the two halves slide apart sideways (unchanged). Phones: they fade
+  // out with a small upward drift instead, so nothing sweeps across the cards.
+  const textMotion = (dir: -1 | 1): CSSProperties =>
+    isMobileState
+      ? { transform: `translateY(-${scrollProgress * 28}px)`, opacity: Math.max(0, 1 - scrollProgress * 1.8) }
+      : { transform: `translateX(${dir < 0 ? '-' : ''}${textTranslateX}vw)` };
   // Fully visible by 60% of the way through, when revealing
   const mediaOpacity = revealOnScroll ? Math.min(1, scrollProgress / 0.6) : 1;
 
@@ -250,6 +261,19 @@ const ScrollExpandMedia = ({
 
           <div className="w-full flex flex-col items-center justify-start relative z-10">
             <div className="flex flex-col items-center justify-center w-full h-[100dvh] relative">
+              <h1
+                // pointer-events-none: once the title has slid away, its empty box must not block the cards
+                className={`flex items-center justify-center text-center gap-2 w-full relative z-10 transition-none flex-col pointer-events-none ${
+                  textBlend ? 'mix-blend-difference' : 'mix-blend-normal'
+                }`}
+              >
+                <motion.span className="sx-title" style={textMotion(-1)}>
+                  {firstPart}
+                </motion.span>
+                <motion.span className="sx-title sx-title--accent" style={textMotion(1)}>
+                  {restOfTitle}
+                </motion.span>
+              </h1>
               <div
                 className="absolute z-0 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 transition-none rounded-[28px]"
                 style={{
@@ -280,6 +304,21 @@ const ScrollExpandMedia = ({
                       className="absolute inset-0 bg-black/30 rounded-[28px]"
                       initial={{ opacity: 0.7 }}
                       animate={{ opacity: 0.5 - scrollProgress * 0.3 }}
+                      transition={{ duration: 0.2 }}
+                    />
+                  </div>
+                ) : mediaType === 'custom' ? (
+                  <div
+                    className="relative w-full h-full overflow-hidden rounded-[28px]"
+                    style={{ opacity: mediaOpacity, pointerEvents: mediaFullyExpanded ? 'auto' : 'none' }}
+                    inert={!mediaFullyExpanded}
+                  >
+                    {media}
+                    {/* Same tint as before while the title crosses it; clear once expanded */}
+                    <motion.div
+                      className="absolute inset-0 bg-black/60 rounded-[28px] pointer-events-none"
+                      initial={{ opacity: 0.9 }}
+                      animate={{ opacity: 0.9 * (1 - scrollProgress) }}
                       transition={{ duration: 0.2 }}
                     />
                   </div>
@@ -319,30 +358,17 @@ const ScrollExpandMedia = ({
 
                 <div className="flex flex-col items-center text-center relative z-10 mt-4 transition-none">
                   {date && (
-                    <p className="sx-date" style={{ transform: `translateX(-${textTranslateX}vw)` }}>
+                    <p className="sx-date" style={textMotion(-1)}>
                       {date}
                     </p>
                   )}
                   {scrollToExpand && (
-                    <p className="sx-hint" style={{ transform: `translateX(${textTranslateX}vw)` }} aria-hidden="true">
+                    <p className="sx-hint" style={textMotion(1)} aria-hidden="true">
                       {scrollToExpand}
                     </p>
                   )}
                 </div>
               </div>
-
-              <h1
-                className={`flex items-center justify-center text-center gap-2 w-full relative z-10 transition-none flex-col ${
-                  textBlend ? 'mix-blend-difference' : 'mix-blend-normal'
-                }`}
-              >
-                <motion.span className="sx-title" style={{ transform: `translateX(-${textTranslateX}vw)` }}>
-                  {firstPart}
-                </motion.span>
-                <motion.span className="sx-title sx-title--accent" style={{ transform: `translateX(${textTranslateX}vw)` }}>
-                  {restOfTitle}
-                </motion.span>
-              </h1>
             </div>
 
             <motion.section

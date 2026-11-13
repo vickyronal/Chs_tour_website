@@ -1,0 +1,114 @@
+---
+// "Who's travelling?" cards. Shown inside the hero's growing frame, which gives
+// them the same scroll reveal the video had; hover and press motion are unchanged.
+import Arrow from './Arrow.astro';
+import { tripTypes } from '../data/content';
+---
+<section class="wt" aria-labelledby="types-title">
+  <h2 class="section-title" id="types-title">Who's <span class="accent">travelling?</span></h2>
+  <ul class="types">
+    {tripTypes.map((t, i) => (
+      <li style={`--i: ${i}`}>
+        <a class="type" href={`/trips/${t.slug}`}>
+          <img class="scene" src={t.photo} alt="" width="640" height="800" loading="lazy" decoding="async" style={`object-position: ${t.focus}`} />
+          <span class="type__text">
+            <span class="type__label">{t.label}</span>
+            <span class="accent">{t.accent}</span>
+          </span>
+          <span class="type__arrow" aria-hidden="true"><Arrow /></span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  /* Fills the hero frame: heading on top, cards share the remaining height */
+  .wt {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(12px, 2vw, 24px);
+    width: 100%;
+    height: 100%;
+    padding: clamp(16px, 2.5vw, 32px);
+    background: var(--stone);
+    color: var(--ink);
+    container-type: size;
+  }
+  .types {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .types > li { display: flex; min-width: 0; min-height: 0; }
+  .type {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 28px;
+    color: var(--paper);
+    text-decoration: none;
+  }
+  .type > :global(img) { position: absolute; inset: 0; }
+  .type__text {
+    position: absolute;
+    inset: auto 0 0;
+    display: grid;
+    padding: 72px 22px 22px;
+    background: linear-gradient(to bottom, rgb(13 16 20 / 0), rgb(13 16 20 / 0.82) 55%);
+    font-size: 1.25rem;
+  }
+  .type__label { font-size: clamp(1.75rem, 3vw, 2.5rem); font-stretch: 85%; font-weight: 600; letter-spacing: -0.03em; line-height: 1.05; }
+  .type__arrow {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .type__arrow :global(svg) { width: 18px; height: 18px; }
+
+  /* Hover: photo eases in, arrow slides out and back in from the left */
+  .type > :global(img) { transition: transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1); }
+  .type__arrow { overflow: hidden; transition: transform 0.35s var(--ease); }
+  @media (hover: hover) and (pointer: fine) {
+    .type:hover > :global(img) { transform: scale(1.06); }
+    .type:hover .type__arrow { transform: scale(1.08); }
+    .type:hover .type__arrow :global(svg) { animation: arrow-through 0.6s var(--ease) both; }
+  }
+  .type:focus-visible .type__arrow :global(svg) { animation: arrow-through 0.6s var(--ease) both; }
+  @keyframes arrow-through {
+    0% { transform: translateX(0); opacity: 1; }
+    45% { transform: translateX(150%); opacity: 0; }
+    46% { transform: translateX(-150%); opacity: 0; }
+    100% { transform: translateX(0); opacity: 1; }
+  }
+  /* Touch: a light press */
+  .type { transition: transform 0.25s ease; }
+  .type:active { transform: scale(0.98); }
+
+  /* Phones and upright tablets: two columns, the third card full width below */
+  @container (orientation: portrait) or (max-width: 640px) {
+    .types { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 10px; }
+    .types > li:last-child { grid-column: 1 / -1; }
+    .type { border-radius: 22px; }
+    .type__text { padding: 40px 14px 14px; font-size: 0.9375rem; line-height: 1.25; }
+    .type__label { font-size: 1.375rem; }
+    .type__arrow { top: 10px; right: 10px; width: 40px; height: 40px; }
+  }
+  /* Short phones: tighter heading and spacing so the cards keep their height */
+  @media (max-width: 760px) and (max-height: 700px) {
+    .wt { gap: 8px; padding: 12px; }
+    .wt .section-title { font-size: 1.75rem; }
+    .types { gap: 8px; }
+  }
+</style>
